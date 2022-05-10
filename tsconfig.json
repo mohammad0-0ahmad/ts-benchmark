@@ -1,0 +1,22 @@
+{
+	"compilerOptions": {
+		"target": "es5",
+		"module": "es6",
+		"allowJs": true,
+		"checkJs": true,
+		"jsx": "react",
+		"declaration": false,
+		"outDir": "./bin",
+		"rootDir": "./src",
+		"removeComments": true,
+		"strict": true,
+		"moduleResolution": "node",
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"baseUrl": ".",
+		"paths": {
+			"utilities": ["./src/utilities"]
+		}
+	},
+	"include": ["./src"]
+}
