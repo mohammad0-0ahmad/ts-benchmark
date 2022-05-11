@@ -51,5 +51,7 @@ export const storage: StorageType = {};
 interface StorageType {
 	initial?: void | Record<any, any>;
 	branch?: void | Record<any, any>;
+	branchName?: string;
+	currentBranchName?: string;
 	previous?: void | Record<any, any>;
 }

@@ -1,6 +1,10 @@
 import { benchmarkFields } from 'src/constants';
+import { ArgsType } from 'src/ui';
 
-export const benchmarkResultToObject: BenchmarkResultToObjectType = (visibleFields, benchmark) => {
+export const benchmarkResultToObject: BenchmarkResultToObjectType = (
+	{ visibleFields },
+	benchmark,
+) => {
 	if (!benchmark) {
 		return;
 	}
@@ -21,15 +25,15 @@ export const benchmarkResultToObject: BenchmarkResultToObjectType = (visibleFiel
  * @returns
  */
 export const resolveVisibleFieldsEntries: ResolveVisibleFieldsEntriesType = (fields) => {
-	if (!fields || fields === 'false' || fields === 'true') {
+	if (typeof fields === 'string') {
 		return benchmarkFields.map<[number, string]>((field, index) => [index, field]);
 	}
 
-	return fields.split(fields.includes(',') ? ',' : ' ')?.reduce((prev: any, indexString) => {
+	return fields?.reduce((prev: any, field) => {
+		const index = field - 1;
 		try {
-			const index = parseInt(indexString) - 1;
 			if (!benchmarkFields?.[index]) {
-				throw new Error();
+				return prev;
 			}
 			return [...prev, [index, benchmarkFields?.[index]]];
 		} catch (error) {
@@ -38,7 +42,10 @@ export const resolveVisibleFieldsEntries: ResolveVisibleFieldsEntriesType = (fie
 	}, []);
 };
 
-export const benchmarkTableObject: BenchmarkTableObjectType = (fields, benchmarks = {}) => {
+export const benchmarkTableObject: BenchmarkTableObjectType = (
+	{ visibleFields: fields },
+	benchmarks = {},
+) => {
 	const columns = Object.keys(benchmarks);
 	if (!benchmarks || !columns?.length) return {};
 
@@ -57,13 +64,13 @@ export const benchmarkTableObject: BenchmarkTableObjectType = (fields, benchmark
 /* -------------------------------------------------------------------------- */
 
 type BenchmarkResultToObjectType = (
-	visibleFields: [number, string][],
+	args: ArgsType,
 	benchmark?: string | void,
 ) => Record<any, any> | void;
 
-type ResolveVisibleFieldsEntriesType = (fields?: string) => [number, string][];
+type ResolveVisibleFieldsEntriesType = (fields?: number[] | string) => [number, string][];
 
 type BenchmarkTableObjectType = (
-	fields: [number, string][],
+	args: ArgsType,
 	benchmarks?: Record<any, any> | void,
 ) => Record<any, any>;

@@ -9,13 +9,14 @@ const userInterface: UserInterfaceType = () => {
 		.option('path', {
 			alias: 'p',
 			describe:
-				'A relative path to test project that depend on the package which will be used to benchmark the package types performance.',
+				'A relative path to test project that depend on the package which will be used to benchmark the package ts performance.',
 			type: 'string',
 			demandOption: true,
 		})
 		.option('watch', {
 			alias: 'w',
-			describe: 'A relative path to package types that will be watched.',
+			describe:
+				'A relative path to a directory or a file that trigger benchmark process on any changes.',
 			type: 'string',
 		})
 		.option('branch', {
@@ -38,10 +39,10 @@ const userInterface: UserInterfaceType = () => {
 			alias: 'f',
 			describe:
 				'Uses to pick and show specific fields of benchmark result.\n Check how this option value format: https://www.npmjs.com/package/ts-benchmark#fields',
-			type: 'string',
+			type: 'array',
 		})
 		.wrap(Math.min(100, yargs.terminalWidth()))
-		.help().argv;
+		.help().argv as unknown as ArgsType;
 };
 
 export default userInterface;
@@ -50,4 +51,15 @@ export default userInterface;
 /*                                    Types                                   */
 /* -------------------------------------------------------------------------- */
 
-type UserInterfaceType = () => Record<any, any>;
+type UserInterfaceType = () => ArgsType;
+
+export type ArgsType = {
+	$0: string;
+	path: string;
+	visibleFields: [number, string][];
+	save?: boolean;
+	watch?: string;
+	branch?: string;
+	fields?: string;
+	initial?: boolean;
+};

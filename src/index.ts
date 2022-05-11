@@ -28,27 +28,27 @@ async function main() {
 	/*                                  Preparing                                 */
 	/* -------------------------------------------------------------------------- */
 	const visibleFields = resolveVisibleFieldsEntries(fields);
-	await prepareStorage(args);
+	args.visibleFields = visibleFields;
+
+	if (initial || branch) {
+		await prepareStorage(args);
+	}
 
 	/* -------------------------------------------------------------------------- */
 	/*                                  print FN                                  */
 	/* -------------------------------------------------------------------------- */
 	const print = async () => {
 		console.log(`${$0}: Start benchmarking...\n`);
-		const current = benchmarkResultToObject(visibleFields, await benchmark(args)) || {};
-		const output = benchmarkTableObject(visibleFields, {
+		const current = benchmarkResultToObject(args, await benchmark(args)) || {};
+		const output = benchmarkTableObject(args, {
 			...(storage?.branch ? { [branch as unknown as string]: storage.branch } : {}),
 			...(storage?.initial ? { initial: storage.initial } : {}),
 			...(storage?.previous ? { previous: storage.previous } : {}),
 			current,
 		});
 		console.table(output);
-		const shouldSaveInitialBenchmark = initial && !storage.initial;
-		if (save && shouldSaveInitialBenchmark) {
+		if (save) {
 			storage.previous = current;
-		}
-		if (shouldSaveInitialBenchmark) {
-			storage.initial = current;
 		}
 	};
 
@@ -56,7 +56,12 @@ async function main() {
 	/*                                   Output                                   */
 	/* -------------------------------------------------------------------------- */
 	if (watch) {
-		watcher(watch, { persistent: true }).on('change', print);
+		const watchingMsg = `\n${$0}: I am looking for changes... (0_0)`;
+		console.log(watchingMsg);
+		watcher(watch, { persistent: true }).on('change', () => {
+			print();
+			console.log(watchingMsg);
+		});
 	} else {
 		print();
 	}
