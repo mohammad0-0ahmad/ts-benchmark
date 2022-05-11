@@ -1,5 +1,7 @@
-import { benchmarkFields } from 'src/constants';
+import { benchmarkFields, tableColors } from 'src/constants';
 import { ArgsType } from 'src/ui';
+import { Table } from 'console-table-printer';
+import { ColumnOptionsRaw } from 'console-table-printer/dist/src/models/external-table';
 
 export const benchmarkResultToObject: BenchmarkResultToObjectType = (
 	{ visibleFields },
@@ -42,21 +44,32 @@ export const resolveVisibleFieldsEntries: ResolveVisibleFieldsEntriesType = (fie
 	}, []);
 };
 
-export const benchmarkTableObject: BenchmarkTableObjectType = (
+export const resolveBenchmarkTable: ResolveBenchmarkTableType = (
 	{ visibleFields: fields },
 	benchmarks = {},
 ) => {
-	const columns = Object.keys(benchmarks);
-	if (!benchmarks || !columns?.length) return {};
-
-	return fields.reduce((prev, [_, field]) => {
-		return {
+	const columnsStrings = Object.keys(benchmarks);
+	if (!benchmarks || !columnsStrings?.length) {
+		return;
+	}
+	const columns: ColumnOptionsRaw[] = ['field', ...columnsStrings].map((column) => ({
+		name: column,
+		alignment: 'left',
+		//@ts-ignore
+		color: tableColors[column] || 'green',
+	}));
+	const rows = fields.reduce((prev, [_, field]) => {
+		return [
 			...prev,
-			[field]: columns.reduce((prev, column) => {
-				return { ...prev, [column]: benchmarks[column][field] };
-			}, {}),
-		};
-	}, {});
+			{
+				field,
+				...columnsStrings.reduce((prev, column) => {
+					return { ...prev, [column]: benchmarks[column][field] };
+				}, {}),
+			},
+		];
+	}, [] as any[]);
+	return new Table({ columns, rows });
 };
 
 /* -------------------------------------------------------------------------- */
@@ -70,7 +83,7 @@ type BenchmarkResultToObjectType = (
 
 type ResolveVisibleFieldsEntriesType = (fields?: number[] | string) => [number, string][];
 
-type BenchmarkTableObjectType = (
+type ResolveBenchmarkTableType = (
 	args: ArgsType,
 	benchmarks?: Record<any, any> | void,
-) => Record<any, any>;
+) => Table | undefined;

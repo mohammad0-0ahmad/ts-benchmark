@@ -1,6 +1,11 @@
 /**
  *
  */
+export const storage: StorageType = {};
+
+/**
+ *
+ */
 export const benchmarkFields = [
 	'Files',
 	'Lines of Library',
@@ -39,10 +44,12 @@ export const benchmarkFields = [
 	'Total time',
 ];
 
-/**
- *
- */
-export const storage: StorageType = {};
+export const tableColors = {
+	field: 'white',
+	initial: 'blue',
+	previous: 'yellow',
+	current: 'cyan',
+};
 
 /* -------------------------------------------------------------------------- */
 /*                                    Types                                   */

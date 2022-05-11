@@ -4,10 +4,11 @@ import userInterface from './ui';
 import { benchmark } from './utilities/benchmark';
 import {
 	benchmarkResultToObject,
-	benchmarkTableObject,
+	resolveBenchmarkTable,
 	resolveVisibleFieldsEntries,
 } from './utilities/formatter';
 import { prepareStorage } from './utilities/storageManager';
+const { printTable } = require('console-table-printer');
 
 const args = userInterface();
 const { $0, save, watch, branch, fields, initial } = args;
@@ -40,13 +41,13 @@ async function main() {
 	const print = async () => {
 		console.log(`${$0}: Start benchmarking...\n`);
 		const current = benchmarkResultToObject(args, await benchmark(args)) || {};
-		const output = benchmarkTableObject(args, {
+		const table = resolveBenchmarkTable(args, {
 			...(storage?.branch ? { [branch as unknown as string]: storage.branch } : {}),
 			...(storage?.initial ? { initial: storage.initial } : {}),
 			...(storage?.previous ? { previous: storage.previous } : {}),
 			current,
 		});
-		console.table(output);
+		table && table.printTable();
 		if (save) {
 			storage.previous = current;
 		}
