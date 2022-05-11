@@ -14,14 +14,14 @@ export const prepareStorage: PrepareStorageType = async (args) => {
 		return;
 	}
 
-	storage.currentBranchName = (await run('git branch --show-current')).stdout || '';
+	storage.currentBranchName = (await run('git branch --show-current')).stdout.trim();
 
 	if (initial) {
 		storage.initial = benchmarkResultToObject(args, await benchmark(args)) || {};
 	}
 
 	if (branch) {
-		storage.branchName = branch;
+		storage.branchName = branch.trim();
 		await run('git add .');
 		const shouldCreateTempCommit =
 			Boolean((await run('git diff --name-only --cached')) || false) &&
@@ -32,11 +32,13 @@ export const prepareStorage: PrepareStorageType = async (args) => {
 		await run(`git checkout ${storage.branchName}`);
 		storage.branch = benchmarkResultToObject(args, await benchmark(args)) || {};
 		await run(`git checkout ${storage.currentBranchName}`);
-		if (shouldCreateTempCommit) {
+		const latestCommitMessage =
+			shouldCreateTempCommit && (await run('git log -1 --pretty=%B')).stdout.trim();
+		if (shouldCreateTempCommit && latestCommitMessage === `${$0}-temp-commit`) {
 			await run('git reset HEAD~');
 		}
 	}
-	console.log(`${$0}: Preparing process done.`);
+	console.log(`${$0}: Preparing process done :)`);
 };
 
 /* -------------------------------------------------------------------------- */

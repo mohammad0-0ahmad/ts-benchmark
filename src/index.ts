@@ -8,7 +8,6 @@ import {
 	resolveVisibleFieldsEntries,
 } from './utilities/formatter';
 import { prepareStorage } from './utilities/storageManager';
-const { printTable } = require('console-table-printer');
 
 const args = userInterface();
 const { $0, save, watch, branch, fields, initial } = args;
@@ -47,7 +46,7 @@ async function main() {
 			...(storage?.previous ? { previous: storage.previous } : {}),
 			current,
 		});
-		table && table.printTable();
+		table?.printTable();
 		if (save) {
 			storage.previous = current;
 		}
@@ -57,10 +56,10 @@ async function main() {
 	/*                                   Output                                   */
 	/* -------------------------------------------------------------------------- */
 	if (watch) {
-		const watchingMsg = `\n${$0}: I am looking for changes... (0_0)`;
+		const watchingMsg = `\n${$0}: I am looking for changes... (0_0)\n`;
 		console.log(watchingMsg);
-		watcher(watch, { persistent: true }).on('change', () => {
-			print();
+		watcher(watch, { persistent: true }).on('change', async () => {
+			await print();
 			console.log(watchingMsg);
 		});
 	} else {
