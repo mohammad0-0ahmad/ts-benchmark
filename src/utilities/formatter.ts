@@ -1,4 +1,4 @@
-import { benchmarkFields, tableColors } from 'src/constants';
+import { benchmarkFields, storage, tableColors, TableStaticColumns } from 'src/constants';
 import { ArgsType } from 'src/ui';
 import { Table } from 'console-table-printer';
 import { ColumnOptionsRaw } from 'console-table-printer/dist/src/models/external-table';
@@ -52,12 +52,14 @@ export const resolveBenchmarkTable: ResolveBenchmarkTableType = (
 	if (!benchmarks || !columnsStrings?.length) {
 		return;
 	}
-	const columns: ColumnOptionsRaw[] = ['field', ...columnsStrings].map((column) => ({
-		name: column,
-		alignment: 'left',
-		//@ts-ignore
-		color: tableColors[column] || 'green',
-	}));
+	const columns: ColumnOptionsRaw[] =
+		storage?.tableColumns ||
+		['field', ...columnsStrings].map((column) => ({
+			name: column,
+			alignment: 'left',
+			color: tableColors?.[column as TableStaticColumns] || 'green',
+			title: column.charAt(0).toUpperCase() + column.slice(1),
+		}));
 	const rows = fields.reduce((prev, [_, field]) => {
 		return [
 			...prev,
@@ -69,7 +71,7 @@ export const resolveBenchmarkTable: ResolveBenchmarkTableType = (
 			},
 		];
 	}, [] as any[]);
-	return new Table({ columns, rows });
+	return new Table({ columns, rows, title: '<{ Benchmark result }>' });
 };
 
 /* -------------------------------------------------------------------------- */

@@ -1,3 +1,5 @@
+import { ColumnOptionsRaw } from 'console-table-printer/dist/src/models/external-table';
+
 /**
  *
  */
@@ -44,7 +46,7 @@ export const benchmarkFields = [
 	'Total time',
 ];
 
-export const tableColors = {
+export const tableColors: Record<TableStaticColumns, any> = {
 	field: 'white',
 	initial: 'blue',
 	previous: 'yellow',
@@ -61,4 +63,7 @@ interface StorageType {
 	branchName?: string;
 	currentBranchName?: string;
 	previous?: void | Record<any, any>;
+	tableColumns?: ColumnOptionsRaw[];
 }
+
+export type TableStaticColumns = 'field' | 'initial' | 'previous' | 'current';
