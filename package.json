@@ -1,22 +1,32 @@
 {
 	"name": "ts-benchmark",
-	"version": "0.0.2",
-	"description": "A command line interface for monitoring the performance of typescript definitions.",
+	"version": "0.9.0",
+	"description": "A command line interface for monitoring the performance of typescript.",
 	"keywords": [
-		"typescript",
-		"ts",
+		"TypeScript",
+		"TS",
 		"cli",
 		"command line interface",
 		"command line tool",
 		"benchmark",
 		"performance",
-		"watcher"
+		"test",
+		"monitor",
+		"watcher",
+		"watch",
+		"watching"
 	],
-	"author": "Mohammad Ahmad",
+	"author": {
+		"name": "Mohammad Ahmad",
+		"url": "http://mohammad-ahmad.se"
+	},
+	"repository": {
+		"url": "https://github.com/mohammad0-0ahmad/ts-benchmark"
+	},
 	"license": "ISC",
 	"main": "bin/index.js",
 	"bin": {
-		"ts-benchmark": "./bin/index.js"
+		"ts-benchmark": "bin/index.js"
 	},
 	"scripts": {
 		"build": "rollup -c",
