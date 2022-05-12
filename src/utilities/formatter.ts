@@ -27,7 +27,7 @@ export const benchmarkResultToObject: BenchmarkResultToObjectType = (
  * @returns
  */
 export const resolveVisibleFieldsEntries: ResolveVisibleFieldsEntriesType = (fields) => {
-	if (typeof fields === 'string') {
+	if (!fields || typeof fields === 'string') {
 		return benchmarkFields.map<[number, string]>((field, index) => [index, field]);
 	}
 
