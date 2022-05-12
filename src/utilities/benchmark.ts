@@ -5,11 +5,14 @@ export const benchmark: BenchmarkType = async ({ $0, path }) => {
 		return;
 	}
 	try {
-		const { error, stdout } = await run(`tsc -p ${path} --extendeddiagnostics`);
-		let resultStartAt = 0;
+		const { error, stdout } = await run(`tsc -p ${path} --extendeddiagnostics -noEmit`);
+		const resultStartAt = stdout.indexOf('Files:');
 		if (error) {
-			resultStartAt = stdout.indexOf('Files:');
 			console.error(`${$0}:\n`, stdout.substring(0, resultStartAt));
+		}
+		if (resultStartAt === -1) {
+			console.log(stdout);
+			return;
 		}
 		return stdout.substring(resultStartAt);
 	} catch (error) {

@@ -39,12 +39,12 @@ async function main() {
 	/* -------------------------------------------------------------------------- */
 	const print = async () => {
 		console.log(`${$0}: Start benchmarking...\n`);
-		const current = benchmarkResultToObject(args, await benchmark(args)) || {};
+		const current = benchmarkResultToObject(args, await benchmark(args));
 		const table = resolveBenchmarkTable(args, {
 			...(storage?.branch ? { [branch as unknown as string]: storage.branch } : {}),
 			...(storage?.initial ? { initial: storage.initial } : {}),
 			...(storage?.previous ? { previous: storage.previous } : {}),
-			current,
+			...(current ? { current } : {}),
 		});
 		table?.printTable();
 		if (save) {

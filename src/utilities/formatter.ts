@@ -10,10 +10,10 @@ export const benchmarkResultToObject: BenchmarkResultToObjectType = (
 	if (!benchmark) {
 		return;
 	}
-	const benchmarkRows = benchmark.split('\n');
 
+	const benchmarkRows = benchmark.split('\n');
 	return visibleFields?.reduce((prev, [index, field]) => {
-		if (benchmarkRows[index].startsWith(field)) {
+		if (benchmarkRows[index]?.startsWith(field)) {
 			const lineValue = benchmarkRows[index].match(/\d.*/)?.[0];
 			return lineValue ? { ...prev, [field]: lineValue } : prev;
 		}
