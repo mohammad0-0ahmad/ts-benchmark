@@ -1,5 +1,5 @@
 <h1 align="center" >
-mongoose-auto-ts
+ts-benchmark
 </h1>
 <br/><br/><br/>
 
