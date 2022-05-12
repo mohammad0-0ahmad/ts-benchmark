@@ -8,8 +8,7 @@ const userInterface: UserInterfaceType = () => {
 		)
 		.option('path', {
 			alias: 'p',
-			describe:
-				'A relative path to test project that depend on the package which will be used to benchmark the package ts performance.',
+			describe: 'A relative path to project that will be benchmarked.',
 			type: 'string',
 			default: './',
 		})
@@ -22,7 +21,7 @@ const userInterface: UserInterfaceType = () => {
 		.option('branch', {
 			alias: 'b',
 			describe:
-				'Another git branch to be benchmarked to be able to compare with the current branch.',
+				'Another git branch name to be benchmarked and compared with the current branch.',
 			type: 'string',
 		})
 		.option('save', {
@@ -40,7 +39,7 @@ const userInterface: UserInterfaceType = () => {
 		.option('fields', {
 			alias: 'f',
 			describe:
-				'Uses to pick and show specific fields of benchmark result.\n Check how this option value format: https://www.npmjs.com/package/ts-benchmark#fields',
+				'To pick and show specific fields of benchmark result by its index numbers.\n Check how this option value format: https://www.npmjs.com/package/ts-benchmark#fields',
 			type: 'array',
 		})
 		.wrap(Math.min(100, yargs.terminalWidth()))
