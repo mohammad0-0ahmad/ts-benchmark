@@ -11,7 +11,7 @@ const userInterface: UserInterfaceType = () => {
 			describe:
 				'A relative path to test project that depend on the package which will be used to benchmark the package ts performance.',
 			type: 'string',
-			demandOption: true,
+			default: './',
 		})
 		.option('watch', {
 			alias: 'w',
@@ -29,11 +29,13 @@ const userInterface: UserInterfaceType = () => {
 			alias: 's',
 			describe: 'To save and show the previous benchmark result.',
 			type: 'boolean',
+			default: false,
 		})
 		.option('initial', {
 			alias: 'i',
 			describe: 'To save and show the initial benchmark result.',
 			type: 'boolean',
+			default: false,
 		})
 		.option('fields', {
 			alias: 'f',
