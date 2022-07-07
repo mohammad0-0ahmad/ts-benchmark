@@ -1,12 +1,7 @@
 import { watch as watcher } from 'chokidar';
-import { storage } from './constants';
 import userInterface from './ui';
-import { benchmark } from './utilities/benchmark';
-import {
-	benchmarkResultToObject,
-	resolveBenchmarkTable,
-	resolveVisibleFieldsEntries,
-} from './utilities/formatter';
+import { resolveVisibleFieldsEntries } from './utilities/formatter';
+import { print } from './utilities/logger';
 import { prepareStorage } from './utilities/storageManager';
 
 const args = userInterface();
@@ -35,34 +30,16 @@ async function main() {
 	}
 
 	/* -------------------------------------------------------------------------- */
-	/*                                  print FN                                  */
-	/* -------------------------------------------------------------------------- */
-	const print = async () => {
-		console.log(`${$0}: Start benchmarking...\n`);
-		const current = benchmarkResultToObject(args, await benchmark(args));
-		const table = resolveBenchmarkTable(args, {
-			...(storage?.branch ? { [branch as unknown as string]: storage.branch } : {}),
-			...(storage?.initial ? { initial: storage.initial } : {}),
-			...(storage?.previous ? { previous: storage.previous } : {}),
-			...(current ? { current } : {}),
-		});
-		table?.printTable();
-		if (save) {
-			storage.previous = current;
-		}
-	};
-
-	/* -------------------------------------------------------------------------- */
 	/*                                   Output                                   */
 	/* -------------------------------------------------------------------------- */
 	if (watch) {
 		const watchingMsg = `\n${$0}: I am looking for changes... (0_0)\n`;
 		console.log(watchingMsg);
 		watcher(watch, { persistent: true }).on('change', async () => {
-			await print();
+			await print(args);
 			console.log(watchingMsg);
 		});
 	} else {
-		print();
+		print(args);
 	}
 }
