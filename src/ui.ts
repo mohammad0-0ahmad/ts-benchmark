@@ -42,6 +42,12 @@ const userInterface: UserInterfaceType = () => {
 				'To pick and show specific fields of benchmark result by its index numbers.\n Check how this option value format: https://www.npmjs.com/package/ts-benchmark#fields',
 			type: 'array',
 		})
+		.option('github', {
+			alias: 'g',
+			describe:
+				'To integrate result with github workflow.\n Check how this option value format: https://www.npmjs.com/package/ts-benchmark#fields',
+			type: 'boolean',
+		})
 		.wrap(Math.min(100, yargs.terminalWidth()))
 		.help().argv as unknown as ArgsType;
 };
@@ -63,4 +69,5 @@ export type ArgsType = {
 	branch?: string;
 	fields?: string[];
 	initial?: boolean;
+	github?: boolean;
 };

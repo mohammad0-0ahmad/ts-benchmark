@@ -78,6 +78,7 @@ export const resolveBenchmarkTableData: ResolveBenchmarkTableDataType = (
 		}));
 
 	const rejectedFields: string[] = [];
+	const rejectedFieldsDetails: any[] = [];
 
 	const rows: TableRowsDataType = Object.entries(fields).reduce((prev, [_, { label, max }]) => {
 		const row = {
@@ -97,6 +98,7 @@ export const resolveBenchmarkTableData: ResolveBenchmarkTableDataType = (
 					console.log(column);
 
 					rejectedFields.push(label);
+					rejectedFieldsDetails.push({ field: label, current: benchmarkValue, maximum: max });
 				}
 
 				return {
@@ -124,6 +126,7 @@ export const resolveBenchmarkTableData: ResolveBenchmarkTableDataType = (
 				maxLen: 3,
 			},
 		],
+		rejectedFieldsDetails,
 	};
 };
 
@@ -143,10 +146,11 @@ type ResolveBenchmarkTableDataType = (
 	benchmarks: Partial<Record<Exclude<TableStaticColumns, 'field'>, Record<string, string>>>,
 	markRejectedValue?: boolean,
 ) =>
-	| ({ columns: ColumnOptionsRaw[]; rows: TableRowsDataType } & Omit<
-			ComplexOptions,
-			'rows,columns'
-	  >)
+	| ({
+			columns: ColumnOptionsRaw[];
+			rows: TableRowsDataType;
+			rejectedFieldsDetails: { field: string; current: string; maximum: string }[];
+	  } & Omit<ComplexOptions, 'rows,columns'>)
 	| undefined;
 
 type TableRowsDataType = { [K in TableStaticColumns]: string }[];
