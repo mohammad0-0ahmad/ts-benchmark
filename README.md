@@ -41,11 +41,19 @@ ts-benchmark -p ./test -w ./src
 
 ```
 
-Same previous command but it will shows specific fields of benchmark result instead of all <a href="#fields">fields</a>:
+Like the previous command but it will shows specific fields of benchmark result instead of all <a href="#fields">fields</a>:
 
 ```shell
 
 ts-benchmark -p ./test -w ./src -f 17 18 29 32
+
+```
+
+Similar to the previous command but it will check if field 17 has reached the maximum valid value "10000":
+
+```shell
+
+ts-benchmark -p ./test -w ./src -f 17/10000 18 29 32
 
 ```
 
@@ -103,9 +111,15 @@ ts-benchmark -p ./test -w ./src -b master
 </tr>
 <tr>
 <td>-f, --fields</td>
-<td>To pick and show specific fields of benchmark result by its index numbers.</td>
+<td>To pick and show specific fields of benchmark result by its index numbers. Maximum valid valid can be set by adding "/" and then maximum value like: 17/10000</td>
 <td>array of index numbers between 1-32</td>
 <td>undefined</td>
+</tr>
+<tr>
+<td>-g, --github</td>
+<td>To make the tool integrate with github workflow. "will throw error on failure if a field has overpassed its maximum valid value."</td>
+<td>boolean</td>
+<td>false</td>
 </tr>
 <tr>
 <td>--help</td>

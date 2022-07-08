@@ -95,8 +95,6 @@ export const resolveBenchmarkTableData: ResolveBenchmarkTableDataType = (
 
 				if (shouldBeMarkedAsRejectedResult) {
 					benchmarkValue = chalk.red(benchmarkValue);
-					console.log(column);
-
 					rejectedFields.push(label);
 					rejectedFieldsDetails.push({ field: label, current: benchmarkValue, maximum: max });
 				}
