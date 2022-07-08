@@ -34,6 +34,7 @@
 		"publish": "npm publish"
 	},
 	"dependencies": {
+		"chalk": "^4.1.2",
 		"chokidar": "^3.5.3",
 		"console-table-printer": "^2.11.0",
 		"yargs": "^17.4.1"

@@ -1,4 +1,5 @@
 import yargs from 'yargs';
+import { FieldsConfigType } from './utilities/formatter';
 
 const userInterface: UserInterfaceType = () => {
 	return yargs
@@ -20,8 +21,7 @@ const userInterface: UserInterfaceType = () => {
 		})
 		.option('branch', {
 			alias: 'b',
-			describe:
-				'Another git branch name to be benchmarked and compared with the current branch.',
+			describe: 'Another git branch name to be benchmarked and compared with the current branch.',
 			type: 'string',
 		})
 		.option('save', {
@@ -57,10 +57,10 @@ type UserInterfaceType = () => ArgsType;
 export type ArgsType = {
 	$0: string;
 	path: string;
-	visibleFields: [number, string][];
+	visibleFields: FieldsConfigType;
 	save?: boolean;
 	watch?: string;
 	branch?: string;
-	fields?: string;
+	fields?: string[];
 	initial?: boolean;
 };

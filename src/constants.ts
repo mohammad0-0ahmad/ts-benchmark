@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import { ColumnOptionsRaw } from 'console-table-printer/dist/src/models/external-table';
 
 /**
@@ -43,12 +44,17 @@ export const benchmarkFields = [
 	'Total time',
 ];
 
-export const tableColors: Record<TableStaticColumns, any> = {
+export const tableFieldsColors: Record<TableStaticColumns, string> = {
 	field: 'white',
 	initial: 'blue',
 	previous: 'yellow',
 	current: 'cyan',
 };
+
+export const unicodeSymbols = {
+	checkMark: chalk.green('\u2714'),
+	crossMark: chalk.red('\u2716'),
+} as const;
 
 /* -------------------------------------------------------------------------- */
 /*                                    Types                                   */

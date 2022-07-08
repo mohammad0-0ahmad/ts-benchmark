@@ -13,7 +13,7 @@ export default {
 		},
 	],
 	plugins: [
-		shebang({ include: 'bin/index.js'}),
+		shebang({ include: 'bin/index.js' }),
 		typescript({
 			tsconfig: './tsconfig.json',
 		}),

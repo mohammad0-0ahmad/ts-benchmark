@@ -1,7 +1,16 @@
-import { benchmarkFields, storage, tableColors, TableStaticColumns } from 'src/constants';
+import {
+	benchmarkFields,
+	storage,
+	tableFieldsColors,
+	TableStaticColumns,
+	unicodeSymbols,
+} from 'src/constants';
 import { ArgsType } from 'src/ui';
-import { Table } from 'console-table-printer';
-import { ColumnOptionsRaw } from 'console-table-printer/dist/src/models/external-table';
+import {
+	ColumnOptionsRaw,
+	ComplexOptions,
+} from 'console-table-printer/dist/src/models/external-table';
+import chalk from 'chalk';
 
 export const benchmarkResultToObject: BenchmarkResultToObjectType = (
 	{ visibleFields },
@@ -12,66 +21,110 @@ export const benchmarkResultToObject: BenchmarkResultToObjectType = (
 	}
 
 	const benchmarkRows = benchmark.split('\n');
-	return visibleFields?.reduce((prev, [index, field]) => {
-		if (benchmarkRows[index]?.startsWith(field)) {
+	return Object.entries(visibleFields)?.reduce((prev, [indexString, { label }]) => {
+		const index = parseInt(indexString);
+		if (benchmarkRows[index]?.startsWith(label)) {
 			const lineValue = benchmarkRows[index].match(/\d.*/)?.[0];
-			return lineValue ? { ...prev, [field]: lineValue } : prev;
+			return lineValue ? { ...prev, [label]: lineValue } : prev;
 		}
 		return prev;
 	}, {});
 };
 
-/**
- *
- * @param fields
- * @returns
- */
 export const resolveVisibleFieldsEntries: ResolveVisibleFieldsEntriesType = (fields) => {
 	if (!fields || typeof fields === 'string') {
-		return benchmarkFields.map<[number, string]>((field, index) => [index, field]);
+		return benchmarkFields.reduce<FieldsConfigType>(
+			(config: FieldsConfigType, field, index) => ({ ...config, [index]: { label: field } }),
+			{},
+		);
 	}
 
-	return fields?.reduce((prev: any, field) => {
-		const index = field - 1;
+	return fields?.reduce((config: FieldsConfigType, fieldConfig) => {
+		const [field, max] =
+			typeof fieldConfig === 'number'
+				? [fieldConfig, undefined]
+				: fieldConfig.split('/').map((value) => parseInt(value));
+
+		const index = (field as any) - 1;
+
 		try {
 			if (!benchmarkFields?.[index]) {
-				return prev;
+				return config;
 			}
-			return [...prev, [index, benchmarkFields?.[index]]];
+			return { ...config, [index]: { label: benchmarkFields?.[index], max } };
 		} catch (error) {
-			return prev;
+			return config;
 		}
-	}, []);
+	}, {});
 };
 
-export const resolveBenchmarkTable: ResolveBenchmarkTableType = (
+export const resolveBenchmarkTableData: ResolveBenchmarkTableDataType = (
 	{ visibleFields: fields },
-	benchmarks = {},
+	benchmarks,
+	markRejectedValue = true,
 ) => {
-	const columnsStrings = Object.keys(benchmarks);
-	if (!benchmarks || !columnsStrings?.length) {
+	const columnKeys = Object.keys(benchmarks) as unknown as Exclude<TableStaticColumns, 'field'>[];
+	if (!benchmarks || !columnKeys?.length) {
 		return;
 	}
+
 	const columns: ColumnOptionsRaw[] =
 		storage?.tableColumns ||
-		['field', ...columnsStrings].map((column) => ({
+		['field', ...columnKeys].map((column) => ({
 			name: column,
 			alignment: 'left',
-			color: tableColors?.[column as TableStaticColumns] || 'green',
+			color: tableFieldsColors?.[column as TableStaticColumns] || 'green',
 			title: column.charAt(0).toUpperCase() + column.slice(1),
 		}));
-	const rows = fields.reduce((prev, [_, field]) => {
-		return [
-			...prev,
+
+	const rejectedFields: string[] = [];
+
+	const rows: TableRowsDataType = Object.entries(fields).reduce((prev, [_, { label, max }]) => {
+		const row = {
+			field: label,
+			...columnKeys.reduce((prev, column) => {
+				let benchmarkValue = benchmarks?.[column]?.[label] as string;
+
+				const shouldBeMarkedAsRejectedResult =
+					markRejectedValue && column === 'current' && max
+						? parseFloat(benchmarkValue) < max
+							? false
+							: true
+						: false;
+
+				if (shouldBeMarkedAsRejectedResult) {
+					benchmarkValue = chalk.red(benchmarkValue);
+					console.log(column);
+
+					rejectedFields.push(label);
+				}
+
+				return {
+					...prev,
+					[column]: benchmarkValue,
+				};
+			}, {}),
+		};
+
+		return [...prev, row];
+	}, [] as any);
+
+	return {
+		columns,
+		rows,
+		computedColumns: [
 			{
-				field,
-				...columnsStrings.reduce((prev, column) => {
-					return { ...prev, [column]: benchmarks[column][field] };
-				}, {}),
+				name: 'Status',
+				function: ({ field }: Record<TableStaticColumns, string>) => {
+					return rejectedFields.includes(field)
+						? unicodeSymbols.crossMark
+						: unicodeSymbols.checkMark;
+				},
+				alignment: 'center',
+				maxLen: 3,
 			},
-		];
-	}, [] as any[]);
-	return new Table({ columns, rows, title: '<{ Benchmark result }>' });
+		],
+	};
 };
 
 /* -------------------------------------------------------------------------- */
@@ -81,11 +134,21 @@ export const resolveBenchmarkTable: ResolveBenchmarkTableType = (
 type BenchmarkResultToObjectType = (
 	args: ArgsType,
 	benchmark?: string | void,
-) => Record<any, any> | void;
+) => Record<string, string> | void;
 
-type ResolveVisibleFieldsEntriesType = (fields?: number[] | string) => [number, string][];
+type ResolveVisibleFieldsEntriesType = (fields?: (number | string)[]) => FieldsConfigType;
 
-type ResolveBenchmarkTableType = (
+type ResolveBenchmarkTableDataType = (
 	args: ArgsType,
-	benchmarks?: Record<any, any> | void,
-) => Table | undefined;
+	benchmarks: Partial<Record<Exclude<TableStaticColumns, 'field'>, Record<string, string>>>,
+	markRejectedValue?: boolean,
+) =>
+	| ({ columns: ColumnOptionsRaw[]; rows: TableRowsDataType } & Omit<
+			ComplexOptions,
+			'rows,columns'
+	  >)
+	| undefined;
+
+type TableRowsDataType = { [K in TableStaticColumns]: string }[];
+
+export type FieldsConfigType = Record<number, { label: string; max?: number }>;
