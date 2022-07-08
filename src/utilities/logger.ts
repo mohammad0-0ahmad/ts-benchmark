@@ -16,7 +16,6 @@ export const print = async (args: ArgsType) => {
 			...(current ? { current } : {}),
 		}),
 	);
-	//@ts-ignore
 	table?.printTable();
 	if (save) {
 		storage.previous = current;
