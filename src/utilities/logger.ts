@@ -1,5 +1,5 @@
 import { Table } from 'console-table-printer';
-import { storage, tableFieldsColors } from 'src/constants';
+import { githubTableStyle, storage, tableColorMap } from 'src/constants';
 import { ArgsType } from 'src/ui';
 import { benchmark } from './benchmark';
 import { benchmarkResultToObject, resolveBenchmarkTableData } from './formatter';
@@ -15,7 +15,11 @@ export const print = async (args: ArgsType) => {
 		...(current ? { current } : {}),
 	});
 
-	const table = new Table(tableData);
+	const table = new Table({
+		...(args.github ? githubTableStyle : {}),
+		colorMap: tableColorMap,
+		...tableData,
+	});
 
 	table?.printTable();
 
@@ -28,7 +32,9 @@ export const print = async (args: ArgsType) => {
 		tableData?.rejectedFieldsDetails.length > 0
 	) {
 		const core = require('@actions/core');
-		const err = new Table({
+		const detailsTable = new Table({
+			...(args.github ? githubTableStyle : {}),
+			colorMap: tableColorMap,
 			columns: [
 				{
 					name: 'field',
@@ -46,12 +52,12 @@ export const print = async (args: ArgsType) => {
 			],
 			rows: tableData.rejectedFieldsDetails,
 		});
-		core.error('Action failed with error:\n');
+		core.error();
 		core.setFailed(
-			`The following tests have failed:\n ${tableData.rejectedFieldsDetails
-				.map(({ field }) => field)
-				.join(' ')}`,
+			`Action failed with error:\n
+			The following tests have failed:\n
+			 ${tableData.rejectedFieldsDetails.map(({ field }) => field).join(' ')}.\n\n
+					${detailsTable.render()}`,
 		);
-		err.printTable();
 	}
 };

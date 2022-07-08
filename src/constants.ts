@@ -1,5 +1,9 @@
 import chalk from 'chalk';
-import { ColumnOptionsRaw } from 'console-table-printer/dist/src/models/external-table';
+import {
+	ColumnOptionsRaw,
+	ComplexOptions,
+} from 'console-table-printer/dist/src/models/external-table';
+import { ColorMap } from 'console-table-printer/dist/src/utils/colored-console-line';
 
 /**
  *
@@ -51,10 +55,42 @@ export const tableFieldsColors: Record<TableStaticColumns, string> = {
 	current: 'cyan',
 };
 
+export const branchFieldColor = 'b_green';
+
+export const tableColorMap: ColorMap = {
+	b_green: '\x1b[1m\x1b[32m',
+};
+
+console.log(chalk.red());
+
 export const unicodeSymbols = {
 	checkMark: chalk.green('\u2714'),
 	crossMark: chalk.red('\u2716'),
 } as const;
+
+export const githubTableStyle: ComplexOptions = {
+	style: {
+		headerTop: {
+			left: ' ',
+			mid: ' ',
+			right: ' ',
+			other: ' ',
+		},
+		headerBottom: {
+			left: ' ',
+			mid: ' ',
+			right: ' ',
+			other: ' ',
+		},
+		tableBottom: {
+			left: ' ',
+			mid: ' ',
+			right: ' ',
+			other: ' ',
+		},
+		vertical: ' ',
+	},
+};
 
 /* -------------------------------------------------------------------------- */
 /*                                    Types                                   */

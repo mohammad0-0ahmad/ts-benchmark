@@ -1,5 +1,6 @@
 import {
 	benchmarkFields,
+	branchFieldColor,
 	storage,
 	tableFieldsColors,
 	TableStaticColumns,
@@ -73,7 +74,7 @@ export const resolveBenchmarkTableData: ResolveBenchmarkTableDataType = (
 		['field', ...columnKeys].map((column) => ({
 			name: column,
 			alignment: 'left',
-			color: tableFieldsColors?.[column as TableStaticColumns] || 'green',
+			color: tableFieldsColors?.[column as TableStaticColumns] || branchFieldColor,
 			title: column.charAt(0).toUpperCase() + column.slice(1),
 		}));
 
