@@ -77,10 +77,10 @@ export const githubTableStyle: ComplexOptions = {
 			other: ' ',
 		},
 		headerBottom: {
-			left: ' ',
-			mid: ' ',
-			right: ' ',
-			other: ' ',
+			left: '|',
+			mid: '|',
+			right: '|',
+			other: '-',
 		},
 		tableBottom: {
 			left: ' ',
@@ -88,7 +88,7 @@ export const githubTableStyle: ComplexOptions = {
 			right: ' ',
 			other: ' ',
 		},
-		vertical: ' ',
+		vertical: '|',
 	},
 };
 

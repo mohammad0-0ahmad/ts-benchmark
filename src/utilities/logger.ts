@@ -56,8 +56,8 @@ export const print = async (args: ArgsType) => {
 		core.setFailed(
 			`Action failed with error:\n
 			The following tests have failed:\n
-			 ${tableData.rejectedFieldsDetails.map(({ field }) => field).join(' ')}.\n\n
-					${detailsTable.render()}`,
+			 ${tableData.rejectedFieldsDetails.map(({ field }) => field).join(' ')}.\n\n`,
 		);
+		detailsTable.printTable();
 	}
 };
