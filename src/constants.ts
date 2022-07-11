@@ -1,4 +1,3 @@
-import chalk from 'chalk';
 import {
 	ColumnOptionsRaw,
 	ComplexOptions,
@@ -48,47 +47,52 @@ export const benchmarkFields = [
 	'Total time',
 ];
 
+export const whiteSpaceUC = '\u2800';
+export const VerticalUC = '\u2000';
+
 export const tableFieldsColors: Record<TableStaticColumns, string> = {
 	field: 'white',
+	branch: 'lightgreen',
 	initial: 'blue',
 	previous: 'yellow',
 	current: 'cyan',
 };
 
-export const branchFieldColor = 'b_green';
-
 export const tableColorMap: ColorMap = {
-	b_green: '\x1b[1m\x1b[32m',
+	lightgreen: '\x1b[1m\x1b[32m',
 };
 
-console.log(chalk.red());
+export const terminalSymbols = {
+	checkMark: '✓',
+	crossMark: '⛌',
+} as const;
 
-export const unicodeSymbols = {
-	checkMark: chalk.green('\u2714'),
-	crossMark: chalk.red('\u2716'),
+export const githubSymbols = {
+	checkMark: '✔️',
+	crossMark: '❌',
 } as const;
 
 export const githubTableStyle: ComplexOptions = {
 	style: {
 		headerTop: {
-			left: ' ',
-			mid: ' ',
-			right: ' ',
-			other: ' ',
+			left: VerticalUC,
+			mid: VerticalUC,
+			right: VerticalUC,
+			other: whiteSpaceUC,
 		},
 		headerBottom: {
-			left: '|',
-			mid: '|',
-			right: '|',
-			other: '-',
+			left: VerticalUC,
+			mid: VerticalUC,
+			right: VerticalUC,
+			other: whiteSpaceUC,
 		},
 		tableBottom: {
-			left: ' ',
-			mid: ' ',
-			right: ' ',
-			other: ' ',
+			left: whiteSpaceUC,
+			mid: whiteSpaceUC,
+			right: whiteSpaceUC,
+			other: whiteSpaceUC,
 		},
-		vertical: '|',
+		vertical: VerticalUC,
 	},
 };
 
@@ -105,4 +109,4 @@ interface StorageType {
 	tableColumns?: ColumnOptionsRaw[];
 }
 
-export type TableStaticColumns = 'field' | 'initial' | 'previous' | 'current';
+export type TableStaticColumns = 'field' | 'branch' | 'initial' | 'previous' | 'current';

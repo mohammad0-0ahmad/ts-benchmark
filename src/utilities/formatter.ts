@@ -1,10 +1,11 @@
 import {
 	benchmarkFields,
-	branchFieldColor,
+	githubSymbols,
 	storage,
+	tableColorMap,
 	tableFieldsColors,
 	TableStaticColumns,
-	unicodeSymbols,
+	terminalSymbols,
 } from 'src/constants';
 import { ArgsType } from 'src/ui';
 import {
@@ -12,6 +13,7 @@ import {
 	ComplexOptions,
 } from 'console-table-printer/dist/src/models/external-table';
 import chalk from 'chalk';
+import { SummaryTableRow } from '@actions/core/lib/summary';
 
 export const benchmarkResultToObject: BenchmarkResultToObjectType = (
 	{ visibleFields },
@@ -71,62 +73,120 @@ export const resolveBenchmarkTableData: ResolveBenchmarkTableDataType = (
 
 	const columns: ColumnOptionsRaw[] =
 		storage?.tableColumns ||
-		['field', ...columnKeys].map((column) => ({
-			name: column,
-			alignment: 'left',
-			color: tableFieldsColors?.[column as TableStaticColumns] || branchFieldColor,
-			title: column.charAt(0).toUpperCase() + column.slice(1),
-		}));
+		['field', ...columnKeys].map((column) => {
+			const title = column === 'branch' ? (storage.branchName as string) : column;
+			return {
+				name: column,
+				alignment: 'left',
+				color: tableFieldsColors?.[column as TableStaticColumns],
+				title: title.charAt(0).toUpperCase() + title.slice(1),
+			};
+		});
 
-	const rejectedFields: string[] = [];
-	const rejectedFieldsDetails: any[] = [];
+	let hasBenchmarkFailed = false;
 
-	const rows: TableRowsDataType = Object.entries(fields).reduce((prev, [_, { label, max }]) => {
-		const row = {
-			field: label,
-			...columnKeys.reduce((prev, column) => {
-				let benchmarkValue = benchmarks?.[column]?.[label] as string;
+	const rows: TableRowDataType[] = Object.entries(fields).reduce(
+		(prev, [_, { label: field, max }]) => {
+			let succeed = true;
+			let failureDetails = '';
 
-				const shouldBeMarkedAsRejectedResult =
-					markRejectedValue && column === 'current' && max
-						? parseFloat(benchmarkValue) < max
-							? false
-							: true
-						: false;
+			const row = {
+				field,
+				...columnKeys.reduce((prev, column) => {
+					let benchmarkValue = benchmarks?.[column]?.[field] as string;
 
-				if (shouldBeMarkedAsRejectedResult) {
-					benchmarkValue = chalk.red(benchmarkValue);
-					rejectedFields.push(label);
-					rejectedFieldsDetails.push({ field: label, current: benchmarkValue, maximum: max });
-				}
+					const hasSucceed =
+						markRejectedValue && column === 'current' && max
+							? parseFloat(benchmarkValue) < max
+								? true
+								: false
+							: true;
 
-				return {
-					...prev,
-					[column]: benchmarkValue,
-				};
-			}, {}),
-		};
+					if (!hasSucceed) {
+						hasBenchmarkFailed = true;
+						succeed = false;
+						failureDetails = `Current benchmark result ${benchmarkValue} > ${max}`;
+					}
 
-		return [...prev, row];
-	}, [] as any);
+					return {
+						...prev,
+						[column]: benchmarkValue,
+					};
+				}, {}),
+			};
+
+			return [
+				...prev,
+				{
+					...row,
+					succeed,
+					failureDetails,
+				},
+			];
+		},
+		[] as any,
+	);
 
 	return {
-		columns,
-		rows,
-		computedColumns: [
-			{
-				name: 'Status',
-				function: ({ field }: Record<TableStaticColumns, string>) => {
-					return rejectedFields.includes(field)
-						? unicodeSymbols.crossMark
-						: unicodeSymbols.checkMark;
-				},
-				alignment: 'center',
-				maxLen: 3,
-			},
+		colorMap: tableColorMap,
+		columns: [
+			...columns,
+			...(hasBenchmarkFailed
+				? ([
+						{
+							name: 'succeed',
+							color: 'green',
+							alignment: 'center',
+							title: 'Succeed',
+						},
+						{
+							name: 'failureDetails',
+							alignment: 'left',
+							title: 'Failure details',
+						},
+				  ] as ColumnOptionsRaw[])
+				: []),
 		],
-		rejectedFieldsDetails,
+		rows: hasBenchmarkFailed ? rows : rows.map(({ succeed, failureDetails, ...rest }) => rest),
+		hasBenchmarkFailed,
 	};
+};
+
+export const restyleTerminalTable: RestyleTerminalTableType = (data) => {
+	if (!data) {
+		return data;
+	}
+	const result = {
+		...data,
+		rows: data?.rows.map(({ succeed, current, ...rest }) => ({
+			...rest,
+			current: succeed === false ? chalk.red(current) : current,
+			...(succeed === undefined
+				? {}
+				: {
+						succeed: succeed
+							? chalk.green(terminalSymbols.checkMark)
+							: chalk.red(terminalSymbols.crossMark),
+				  }),
+		})),
+	};
+
+	return result;
+};
+
+export const resolveGithubTableData: ResolveGithubTableDataType = (data) => {
+	if (!data) {
+		return [];
+	}
+	const { columns, rows } = data;
+	const header = columns.map(({ title, name }) => ({ data: title || name, header: true }));
+	const body = rows.map((row) =>
+		Object.values(row).map((item) =>
+			typeof item === 'boolean' ? (item ? githubSymbols.checkMark : githubSymbols.crossMark) : item,
+		),
+	);
+
+	return [header, ...body];
 };
 
 /* -------------------------------------------------------------------------- */
@@ -147,11 +207,23 @@ type ResolveBenchmarkTableDataType = (
 ) =>
 	| ({
 			columns: ColumnOptionsRaw[];
-			rows: TableRowsDataType;
-			rejectedFieldsDetails: { field: string; current: string; maximum: string }[];
-	  } & Omit<ComplexOptions, 'rows,columns'>)
+			rows: TableRowDataType[];
+			hasBenchmarkFailed: boolean;
+	  } & Omit<ComplexOptions, 'rows' | 'columns'>)
 	| undefined;
 
-type TableRowsDataType = { [K in TableStaticColumns]: string }[];
+type TableRowDataType = Partial<
+	Record<TableStaticColumns | 'failureDetails', string> & Record<'succeed', boolean>
+>;
 
 export type FieldsConfigType = Record<number, { label: string; max?: number }>;
+
+type RestyleTerminalTableType = (data: ReturnType<ResolveBenchmarkTableDataType>) =>
+	| (Omit<Exclude<ReturnType<ResolveBenchmarkTableDataType>, undefined>, 'rows'> & {
+			rows: (Omit<TableRowDataType, 'succeed'> & Partial<Record<'succeed', string>>)[];
+	  })
+	| undefined;
+
+type ResolveGithubTableDataType = (
+	data: ReturnType<ResolveBenchmarkTableDataType>,
+) => SummaryTableRow[];
