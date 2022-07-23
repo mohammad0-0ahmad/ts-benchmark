@@ -56,6 +56,7 @@ export const resolveVisibleFieldsEntries: ResolveVisibleFieldsEntriesType = (fie
 			}
 			return { ...config, [index]: { label: benchmarkFields?.[index], max } };
 		} catch (error) {
+		// console.log(error);
 			return config;
 		}
 	}, {});

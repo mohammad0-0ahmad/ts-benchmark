@@ -14,14 +14,18 @@ export const prepareStorage: PrepareStorageType = async (args) => {
 		return;
 	}
 
-	storage.currentBranchName = (await run('git branch --show-current')).stdout.trim();
+	storage.currentBranchName =  (await run( !args.github ? 'git branch --show-current' : 'git rev-parse --short HEAD')).stdout.trim();
 
 	if (initial) {
 		storage.initial = benchmarkResultToObject(args, await benchmark(args)) || {};
 	}
 
-	if (branch) {
-		storage.branchName = branch.trim();
+	storage.branchName = branch ? branch.trim() : undefined;
+	if (storage.branchName && storage.branchName !== storage.currentBranchName) {
+		if (args.github) {
+			await run('git config --global user.email "test@ts-benchmark.com"');
+			await run('git config --global user.name "ts-benchmark"');
+		}
 		await run('git add .');
 		const shouldCreateTempCommit =
 			Boolean((await run('git diff --name-only --cached')) || false) &&
@@ -29,6 +33,7 @@ export const prepareStorage: PrepareStorageType = async (args) => {
 		if (shouldCreateTempCommit) {
 			await run(`git commit -m ${$0}-temp-commit`);
 		}
+
 		await run(`git checkout ${storage.branchName}`);
 		storage.branch = benchmarkResultToObject(args, await benchmark(args)) || {};
 		await run(`git checkout ${storage.currentBranchName}`);

@@ -16,6 +16,7 @@ export const benchmark: BenchmarkType = async ({ $0, path }) => {
 		}
 		return stdout.substring(resultStartAt);
 	} catch (error) {
+		// console.log(error);
 		return;
 	}
 };
