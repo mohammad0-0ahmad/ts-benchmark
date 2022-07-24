@@ -104,6 +104,8 @@ interface StorageType {
 	initial?: void | Record<any, any>;
 	branch?: void | Record<any, any>;
 	branchName?: string;
+	target?: void | Record<any, any>;
+	targetName?: string;
 	currentBranchName?: string;
 	previous?: void | Record<any, any>;
 	tableColumns?: ColumnOptionsRaw[];

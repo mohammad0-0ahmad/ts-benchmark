@@ -8,15 +8,16 @@ import {
 	resolveGithubTableData,
 	restyleTerminalTable,
 } from './formatter';
-import core from '@actions/core';
+import githubCore from '@actions/core';
 import { readFileSync } from 'fs';
-import { dirname, resolve } from 'path';
+import { resolve } from 'path';
 
 export const print = async (args: ArgsType) => {
 	const { save, $0 } = args;
 	const current = benchmarkResultToObject(args, await benchmark(args));
 	const tableData = resolveBenchmarkTableData(args, {
 		...(storage?.branch ? { branch: storage.branch } : {}),
+		...(storage?.target ? { target: storage.target } : {}),
 		...(storage?.initial ? { initial: storage.initial } : {}),
 		...(storage?.previous ? { previous: storage.previous } : {}),
 		...(current ? { current } : {}),
@@ -29,16 +30,17 @@ export const print = async (args: ArgsType) => {
 					rowSeparator: true,
 			  }),
 		...restyleTerminalTable(tableData),
+		title: `<{ ${$0} result }>`,
 	}).render();
 
-	console.log(table.replace(/ /g, whiteSpaceUC));
+	console.log('\n\n', table.replace(/ /g, whiteSpaceUC));
 
 	if (save) {
 		storage.previous = current;
 	}
 	if (process.env?.CI && args.github) {
 		if (tableData?.hasBenchmarkFailed) {
-			core.setFailed('Action failed, Please check failure details');
+			githubCore.setFailed('Action failed, Please check failure details');
 		}
 		let clientPackageName;
 
@@ -48,17 +50,17 @@ export const print = async (args: ArgsType) => {
 		} catch (error) {
 			// console.log(error);
 		}
-		core.summary
+		githubCore.summary
 			.addRaw(`<h3 align="center"><a href="https://www.npmjs.com/package/${$0}">${$0}</a></h3>`)
 			.addBreak()
 			.addTable(resolveGithubTableData(tableData));
 		if (clientPackageName) {
-			core.summary
+			githubCore.summary
 				.addBreak()
 				.addRaw(
 					`<small align="right">This test has been created by ${$0} for supporting ${clientPackageName}</small>`,
 				);
 		}
-		core.summary.addBreak().write();
+		githubCore.summary.addBreak().write();
 	}
 };

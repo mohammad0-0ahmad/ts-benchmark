@@ -1,6 +1,6 @@
 {
 	"name": "ts-benchmark",
-	"version": "1.1.6",
+	"version": "1.1.10",
 	"description": "A command line interface for monitoring the performance of typescript.",
 	"keywords": [
 		"TypeScript",
@@ -14,14 +14,23 @@
 		"monitor",
 		"watcher",
 		"watch",
-		"watching"
+		"watching",
+		"github",
+		"workflow",
+		"github actions",
+		"github workflow"
 	],
 	"author": {
 		"name": "Mohammad Ahmad",
 		"url": "http://mohammad-ahmad.se"
 	},
+	"homepage": "https://www.npmjs.com/package/ts-benchmark",
 	"repository": {
 		"url": "https://github.com/mohammad0-0ahmad/ts-benchmark"
+	},
+	"bugs": {
+		"url": "https://github.com/owner/project/issues",
+		"email": "project@hostname.com"
 	},
 	"license": "ISC",
 	"main": "bin/index.js",

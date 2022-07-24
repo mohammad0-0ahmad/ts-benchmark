@@ -48,6 +48,12 @@ const userInterface: UserInterfaceType = () => {
 				'To integrate result with github workflow.\n Check how this option value format: https://www.npmjs.com/package/ts-benchmark#fields',
 			type: 'boolean',
 		})
+		.option('target', {
+			alias: 't',
+			describe:
+				'Useful for benchmarking targeted branch of github pull request.\n Check how this option value format: https://www.npmjs.com/package/ts-benchmark#fields',
+			type: 'boolean',
+		})
 		.wrap(Math.min(100, yargs.terminalWidth()))
 		.help().argv as unknown as ArgsType;
 };
@@ -70,4 +76,5 @@ export type ArgsType = {
 	fields?: string[];
 	initial?: boolean;
 	github?: boolean;
+	target?: boolean;
 };

@@ -26,4 +26,4 @@ jobs:
         run: npm install
 
       - name: TypeScript benchmark result
-        run: node bin -f 17/10000 18 29 32 -b main -g --colors
+        run: node bin -f 17/10000 18 29 32 -b main -g -t --colors

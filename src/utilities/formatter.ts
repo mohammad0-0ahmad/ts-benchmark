@@ -56,7 +56,7 @@ export const resolveVisibleFieldsEntries: ResolveVisibleFieldsEntriesType = (fie
 			}
 			return { ...config, [index]: { label: benchmarkFields?.[index], max } };
 		} catch (error) {
-		// console.log(error);
+			// console.log(error);
 			return config;
 		}
 	}, {});
@@ -75,7 +75,8 @@ export const resolveBenchmarkTableData: ResolveBenchmarkTableDataType = (
 	const columns: ColumnOptionsRaw[] =
 		storage?.tableColumns ||
 		['field', ...columnKeys].map((column) => {
-			const title = column === 'branch' ? (storage.branchName as string) : column;
+			const title =
+				column === 'branch' || column === 'target' ? (storage[`${column}Name`] as string) : column;
 			return {
 				name: column,
 				alignment: 'left',

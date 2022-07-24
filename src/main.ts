@@ -4,8 +4,8 @@ import { watch as watcher } from 'chokidar';
 import { print } from './utilities/logger';
 
 export const main = async (args: ArgsType) => {
-	const { $0, watch, branch, initial } = args;
-	if (initial || branch) {
+	const { $0, watch, branch, initial, target } = args;
+	if (initial || branch || target) {
 		await prepareStorage(args);
 	}
 	if (watch) {
