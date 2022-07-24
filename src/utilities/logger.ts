@@ -51,15 +51,16 @@ export const print = async (args: ArgsType) => {
 			// console.log(error);
 		}
 		githubCore.summary
-			.addRaw(`<h3 align="center"><a href="https://www.npmjs.com/package/${$0}">${$0}</a></h3>`)
+			.addRaw(`<h3 align="center"><{ <a href="https://www.npmjs.com/package/${$0}">${$0}</a> }></h3>`)
 			.addBreak()
 			.addTable(resolveGithubTableData(tableData));
 		if (clientPackageName) {
 			githubCore.summary
 				.addBreak()
 				.addRaw(
-					`<small align="right">This test has been created by ${$0} for supporting ${clientPackageName}</small>`,
-				);
+					`<small align="right">📊 This test has been performed by ${$0} for supporting ${clientPackageName} 🎉</small>`,
+				)
+				.addRaw(`<h6>Thanks for using ${$0} 🌝</h6>`);
 		}
 		githubCore.summary.addBreak().write();
 	}
