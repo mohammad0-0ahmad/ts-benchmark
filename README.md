@@ -122,6 +122,12 @@ ts-benchmark -p ./test -w ./src -b master
 <td>false</td>
 </tr>
 <tr>
+<td>-t, --target</td>
+<td>Useful for benchmarking targeted branch of github pull request. -g flag should also be set to true as well."</td>
+<td>boolean</td>
+<td>false</td>
+</tr>
+<tr>
 <td>--help</td>
 <td>Show help</td>
 <td>boolean</td>
