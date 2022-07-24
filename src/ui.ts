@@ -77,4 +77,8 @@ export type ArgsType = {
 	initial?: boolean;
 	github?: boolean;
 	target?: boolean;
+	//@ts-ignore
+	test: Test<true>;
 };
+
+type Test<T> = T extends true ? Test<T> : false;
