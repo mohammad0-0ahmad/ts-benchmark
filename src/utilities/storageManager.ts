@@ -44,7 +44,7 @@ export const prepareStorage: PrepareStorageType = async (args) => {
 
 const benchmarkBranch: BenchmarkBranchType = async (args, branchName) => {
 	const { $0, github } = args;
-	if (github) {
+	if (github && process.env?.CI) {
 		await run('git config --global user.email "test@ts-benchmark.com"');
 		await run('git config --global user.name "ts-benchmark"');
 	}
